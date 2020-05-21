@@ -1,13 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Combat;
 using UnityEngine;
 using Movement;
+using UnityEngine.Analytics;
+using UnityEngine.UIElements;
 
 namespace Control
 {
     public class PlayerController : MonoBehaviour
     {
         private Mover _mover;
+        private Fighter _fighter;
         private Camera mainCamera;
 
         private Ray _lastRay;
@@ -17,6 +21,8 @@ namespace Control
         {
             _mover = GetComponent<Mover>();
             if (_mover == null) Debug.LogError("PlayerController cannot find Mover");
+            _fighter = GetComponent<Fighter>();
+            if(_fighter == null) Debug.LogError("No Fighter component on player");
 
             mainCamera = Camera.main;
         }
@@ -24,22 +30,55 @@ namespace Control
         // Update is called once per frame
         void Update()
         {
-            if (Input.GetMouseButton(0))
-            {
-                MoveToCursor();
-            }
+            if (InteractWithCombat()) return;
+            if (InteractWithMovement()) return;
+            Debug.Log("Nothing to do!");
         }
 
-        void MoveToCursor()
+        private bool InteractWithCombat()
         {
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit[] hits = Physics.RaycastAll(GetRay());
+
+            foreach (RaycastHit hit in hits)
+            {
+                CombatTarget target = hit.transform.GetComponent<CombatTarget>();
+                if (target == null) continue;
+
+                if (Input.GetMouseButtonDown(0))
+                {
+                    _fighter.Attack(target);
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private bool InteractWithMovement()
+        {
             RaycastHit hit;
-            bool hitWorld = Physics.Raycast(ray, out hit);
+            bool hitWorld = Physics.Raycast(GetRay(), out hit);
 
             if (hitWorld)
             {
-                _mover.MoveTo(hit.point);
+                if (Input.GetMouseButton(0))
+                {
+                    _mover.StartMovementAction(hit.point);
+                }
+
+                return true;
             }
+            return false;
+        }
+
+        private void MoveWithinRange(Transform target)
+        {
+            
+        }
+        
+
+        private Ray GetRay()
+        {
+            return mainCamera.ScreenPointToRay(Input.mousePosition);
         }
     }
 }

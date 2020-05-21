@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Combat;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -10,6 +11,7 @@ namespace Movement
 
         private NavMeshAgent _navMeshAgent;
         private Animator _animator;
+        private Fighter _fighter;
         
 
         
@@ -19,7 +21,8 @@ namespace Movement
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
             _animator = GetComponent<Animator>();
-            
+            _fighter = GetComponent<Fighter>();
+
         }
 
         // Update is called once per frame
@@ -30,10 +33,20 @@ namespace Movement
             UpdateAnimator();
         }
 
-        
+        public void Stop()
+        {
+            _navMeshAgent.isStopped = true;
+        }
 
+        public void StartMovementAction(Vector3 destination)
+        {
+            _fighter.CancelAttack();
+            MoveTo(destination);
+        }
+        
         public void MoveTo(Vector3 destination)
         {
+            _navMeshAgent.isStopped = false;
             _navMeshAgent.destination = destination;
         }
     
