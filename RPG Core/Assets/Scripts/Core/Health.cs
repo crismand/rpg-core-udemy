@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Analytics;
 
-namespace Combat
+namespace Core
 {
     public class Health : MonoBehaviour
     {
@@ -12,12 +12,16 @@ namespace Combat
         public bool IsDead => isDead;
 
         private Animator _animator;
-        
+        private ActionScheduler _actionScheduler;
+
         // Start is called before the first frame update
         void Start()
         {
             _animator = GetComponent<Animator>();
             if(_animator == null) Debug.LogError("Health cannot find animator");
+
+            _actionScheduler = GetComponent<ActionScheduler>();
+            if(_actionScheduler == null) Debug.LogError("Health cannot find ActionScheduler");
         }
 
         // Update is called once per frame
@@ -42,6 +46,7 @@ namespace Combat
             if (isDead) return;
 
             isDead = true;
+            _actionScheduler.CancelCurrentAction();
             _animator.SetTrigger("Death");
         }
     }

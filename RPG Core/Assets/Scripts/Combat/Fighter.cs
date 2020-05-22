@@ -14,7 +14,7 @@ namespace Combat
         private Animator _animator;
 
         [Range(0.5f, 2.5f)] [SerializeField] private float timeBetweenAttacks = 1.0f;
-        private float _timeSinceLastAttack = 0.0f;
+        private float _timeSinceLastAttack = Mathf.Infinity;
         private float _weaponDamage = 10.0f;
         
         public void Start()
@@ -52,7 +52,7 @@ namespace Combat
             return true;
         }
 
-        public bool CanAttack(CombatTarget target)
+        public bool CanAttack(GameObject target)
         {
             if (target == null) return false;
             
@@ -79,7 +79,7 @@ namespace Combat
                 _target.TakeDamage(_weaponDamage);
         }
 
-        public void Attack(CombatTarget combatTarget)
+        public void Attack(GameObject combatTarget)
         {
             GetComponent<ActionScheduler>().StartAction(this);
             _target = combatTarget.GetComponent<Health>();
