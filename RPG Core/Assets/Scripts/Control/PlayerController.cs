@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Combat;
+using Core;
 using UnityEngine;
 using Movement;
 using UnityEngine.Analytics;
@@ -12,6 +13,7 @@ namespace Control
     {
         private Mover _mover;
         private Fighter _fighter;
+        
         private Camera mainCamera;
 
         private Ray _lastRay;
@@ -30,6 +32,7 @@ namespace Control
         // Update is called once per frame
         void Update()
         {
+            if (GetComponent<Health>().IsDead){ return;}
             if (InteractWithCombat()) return;
             if (InteractWithMovement()) return;
             Debug.Log("Nothing to do!");
@@ -42,11 +45,13 @@ namespace Control
             foreach (RaycastHit hit in hits)
             {
                 CombatTarget target = hit.transform.GetComponent<CombatTarget>();
-                if (!_fighter.CanAttack(target)) continue;
+                if (target == null) continue;
+              
+                if (!_fighter.CanAttack(target.gameObject)) continue;
 
-                if (Input.GetMouseButtonDown(0))
+                if (Input.GetMouseButton(0))
                 {
-                    _fighter.Attack(target);
+                    _fighter.Attack(target.gameObject);
                 }
                 return true;
             }

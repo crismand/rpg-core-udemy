@@ -17,7 +17,11 @@ namespace Core
             _currentAction = action;
             
         }
-        
+
+        public void CancelCurrentAction()
+        {
+            StartAction(null);
+        }
     }
 }
 
